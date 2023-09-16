@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bx8gnmy8gtor5"]
+
+[ext_resource type="Script" path="res://test/scenes/base.gd" id="1_n41tx"]
+
+[node name="Base" type="Node2D"]
+use_parent_material = true
+script = ExtResource("1_n41tx")
+metadata/_access_modifiers = {
+"private_export": 2,
+"private_in_category_1": 2,
+"private_in_category_2": 0,
+"protected_export": 1,
+"public_export": 0
+}
