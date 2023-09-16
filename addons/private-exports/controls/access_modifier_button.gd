@@ -6,9 +6,15 @@ signal changed(modifier: PluginCore.AccessModifier)
 
 var modifier = PluginCore.AccessModifier.Public
 
-var public_icon := preload("../icons/Public.svg")
-var private_icon := preload("../icons/Private.svg")
-var protected_icon := preload("../icons/Protected.svg")
+const public_icon := preload("../icons/Public.svg")
+const private_icon := preload("../icons/Private.svg")
+const protected_icon := preload("../icons/Protected.svg")
+
+const IconMap := {
+	PluginCore.AccessModifier.Public: public_icon,
+	PluginCore.AccessModifier.Private: private_icon,
+	PluginCore.AccessModifier.Protected: protected_icon,
+}
 
 
 func _ready() -> void:
@@ -34,13 +40,8 @@ func _on_press():
 
 func update(new_modifier: PluginCore.AccessModifier):
 	modifier = new_modifier
-	match new_modifier:
-		PluginCore.AccessModifier.Protected:
-			icon = protected_icon
-			tooltip_text = "Protected"
-		PluginCore.AccessModifier.Private:
-			icon = private_icon
-			tooltip_text = "Private"
-		PluginCore.AccessModifier.Public:
-			icon = public_icon
-			tooltip_text = "Public"
+
+	icon = IconMap[new_modifier]
+	tooltip_text = PluginCore.AccessModifierNames[new_modifier]
+
+	queue_redraw()

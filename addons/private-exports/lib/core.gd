@@ -8,6 +8,12 @@ enum AccessModifier {
 	Private = 2,
 }
 
+const AccessModifierNames = [
+	"Public",
+	"Protected",
+	"Private",
+]
+
 
 static func set_access_modifier_with_undo(
 	undoredo: EditorUndoRedoManager, object: Object, property: StringName, modifier: AccessModifier
@@ -34,9 +40,14 @@ static func set_access_modifier(object: Object, property: StringName, modifier: 
 
 
 static func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
-	var metadatas := _get_scene_metadatas(object as Node)
+	var object_metadata = object.get_meta(_MetaKey, {})
 
-	for metadata in metadatas:
+	if property in object_metadata:
+		return object_metadata[property]
+
+	var parent_metadatas := _get_parent_metadatas(object as Node)
+
+	for metadata in parent_metadatas:
 		if property in metadata and metadata[property]:
 			return metadata[property]
 
@@ -46,7 +57,7 @@ static func get_access_modifier(object: Object, property: StringName) -> AccessM
 static func is_property_visible(object: Object, property: StringName) -> bool:
 	if object == EditorInterface.get_edited_scene_root():
 		# Check scene parents
-		var metadatas = _get_scene_metadatas(object)
+		var metadatas = _get_parent_metadatas(object)
 
 		for i in range(1, metadatas.size()):
 			var metadata = metadatas[i]
@@ -113,7 +124,7 @@ static func _get_script(node: Node) -> Script:
 static var _cached_scene_metadata: Array[Dictionary] = []
 
 
-static func _get_scene_metadatas(node: Node) -> Array[Dictionary]:
+static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
 	var scene_path = node.scene_file_path
 
 	if scene_path.is_empty():
@@ -125,19 +136,18 @@ static func _get_scene_metadatas(node: Node) -> Array[Dictionary]:
 	# Generate
 	_cached_scene_metadata = []
 
-	var current_scene: PackedScene = load(scene_path)
+	var parent_scene: PackedScene = load(scene_path).get_state().get_node_instance(0)
+	while parent_scene != null:
+		#_cached_scene_hierarchy.append(parent_scene)
 
-	while current_scene != null:
-		#_cached_scene_hierarchy.append(current_scene)
-
-		var scene_state := current_scene.get_state()
+		var scene_state := parent_scene.get_state()
 
 		for i in scene_state.get_node_property_count(0):
 			if scene_state.get_node_property_name(0, i) == &"metadata/%s" % _MetaKey:
 				_cached_scene_metadata.append(scene_state.get_node_property_value(0, i))
 				break
 
-		current_scene = scene_state.get_node_instance(0)
+		parent_scene = scene_state.get_node_instance(0)
 
 	_cached_scene = scene_path
 

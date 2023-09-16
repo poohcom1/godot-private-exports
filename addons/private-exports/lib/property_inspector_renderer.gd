@@ -66,10 +66,9 @@ func _draw_button(editor_property: EditorProperty):
 	button.update(access_modifier)
 	button.changed.connect(
 		func(modifier: PluginCore.AccessModifier): 
-			# PluginCore.set_access_modifier_with_undo(
-			# 	_editor_plugin.get_undo_redo(), object, property, modifier
-			# )
-			PluginCore.set_access_modifier(object, property, modifier)
+			PluginCore.set_access_modifier_with_undo(
+				_editor_plugin.get_undo_redo(), object, property, modifier
+			)
 			_update_buttons()
 	)
 	_buttons[property] = button
@@ -125,8 +124,6 @@ func _update_buttons():
 		var modifier := PluginCore.get_access_modifier(_object, property)
 		var button = _buttons[property]
 		button.update(modifier)
-
-		print("update: %s %d" % [property, modifier])
 
 
 # Utils

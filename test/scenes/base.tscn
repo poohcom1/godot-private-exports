@@ -8,7 +8,7 @@ script = ExtResource("1_n41tx")
 metadata/_access_modifiers = {
 "private_export": 2,
 "private_in_category_1": 2,
-"private_in_category_2": 0,
+"private_in_category_2": 2,
 "protected_export": 1,
 "public_export": 0
 }
