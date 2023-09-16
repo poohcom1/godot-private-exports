@@ -1,47 +1,49 @@
 extends Button
 
-const PluginCore := preload("../lib/core.gd")
+const Core := preload("../lib/core.gd")
 
-signal changed(modifier: PluginCore.AccessModifier)
-
-var modifier = PluginCore.AccessModifier.Public
-
-const public_icon := preload("../icons/Public.svg")
-const private_icon := preload("../icons/Private.svg")
-const protected_icon := preload("../icons/Protected.svg")
+signal changed(modifier: Core.AccessModifier)
 
 const IconMap := {
-	PluginCore.AccessModifier.Public: public_icon,
-	PluginCore.AccessModifier.Private: private_icon,
-	PluginCore.AccessModifier.Protected: protected_icon,
+	Core.AccessModifier.Public: preload("../icons/Public.svg"),
+	Core.AccessModifier.Private: preload("../icons/Private.svg"),
+	Core.AccessModifier.Protected: preload("../icons/Protected.svg"),
 }
 
+var _modifier := Core.AccessModifier.Public
+var _popup: PopupMenu
 
-func _ready() -> void:
-	icon = public_icon
-	tooltip_text = "Public"
 
+func _init() -> void:
 	pressed.connect(_on_press)
-	update(modifier)
+
+	# Popup
+	_popup = PopupMenu.new()
+	_popup.hide()
+	add_child(_popup)
+	for i in Core.AccessModifier.values():
+		_popup.add_icon_item(IconMap[i], Core.AccessModifierNames[i], i)
+	_popup.id_pressed.connect(func(id: int): changed.emit(id))
 
 
 func _on_press():
-	var new_modifier: PluginCore.AccessModifier
-	match modifier:
-		PluginCore.AccessModifier.Public:
-			new_modifier = PluginCore.AccessModifier.Private
-		PluginCore.AccessModifier.Protected:
-			new_modifier = PluginCore.AccessModifier.Public
-		PluginCore.AccessModifier.Private:
-			new_modifier = PluginCore.AccessModifier.Protected
-	#_draw()
-	changed.emit(new_modifier)
+	var xform := get_screen_transform()
+	var rect := Rect2(xform.get_origin(), xform.get_scale() * get_size())
+
+	rect.position.y += rect.size.y
+	rect.size.y = 0
+	_popup.position = rect.position
+	_popup.size = rect.size
+
+	_popup.popup()
 
 
-func update(new_modifier: PluginCore.AccessModifier):
-	modifier = new_modifier
+func set_modifier(new_modifier: Core.AccessModifier):
+	_modifier = new_modifier
 
 	icon = IconMap[new_modifier]
-	tooltip_text = PluginCore.AccessModifierNames[new_modifier]
+	tooltip_text = Core.AccessModifierNames[new_modifier]
 
-	queue_redraw()
+
+func get_modifier() -> Core.AccessModifier:
+	return _modifier

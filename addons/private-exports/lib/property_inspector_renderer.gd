@@ -1,10 +1,10 @@
 ## Injects access modifier buttons into the property inspector
 
-const PluginCore := preload("./core.gd")
+const Core := preload("./core.gd")
 const Configs := preload("./configs.gd")
 const AccessModifierButton := preload("../controls/access_modifier_button.gd")
 
-const AccessModifier = PluginCore.AccessModifier
+const AccessModifier = Core.AccessModifier
 const DisplayMode = Configs.DisplayMode
 
 const ContainerGroupName = &"__private_exports_containers"
@@ -50,23 +50,23 @@ func _draw_button(editor_property: EditorProperty):
 	if script == null:
 		return  # Not a custom object
 
-	var is_owner = PluginCore.is_current_property_owner(property)
+	var is_owner = Core.is_current_property_owner(property)
 
 	var properties = script.get_script_property_list()
 	if not properties.any(func(e): return e.name == editor_property.get_edited_property()):
 		return  # No custom properties
 
-	var access_modifier = PluginCore.get_access_modifier(object, property)
+	var access_modifier = Core.get_access_modifier(object, property)
 
 	# Draw
 	var editor_control: Control = editor_property.get_child(0)
 	var container: HBoxContainer
 	var button := AccessModifierButton.new()
 	button.add_to_group(ButtonGroupName)
-	button.update(access_modifier)
+	button.set_modifier(access_modifier)
 	button.changed.connect(
-		func(modifier: PluginCore.AccessModifier): 
-			PluginCore.set_access_modifier_with_undo(
+		func(modifier: Core.AccessModifier): 
+			Core.set_access_modifier_with_undo(
 				_editor_plugin.get_undo_redo(), object, property, modifier
 			)
 			_update_buttons()
@@ -105,7 +105,7 @@ func _draw_button(editor_property: EditorProperty):
 			for b in buttons:
 				if display_mode == DisplayMode.Selected:
 					b.hide()
-				elif display_mode == DisplayMode.Modified and b.modifier == AccessModifier.Public:
+				elif display_mode == DisplayMode.Modified and b.get_modifier() == AccessModifier.Public:
 					b.hide()
 			
 			# Display current button
@@ -121,9 +121,9 @@ func _update_buttons():
 	if not _object: return
 	
 	for property in _buttons:
-		var modifier := PluginCore.get_access_modifier(_object, property)
+		var modifier := Core.get_access_modifier(_object, property)
 		var button = _buttons[property]
-		button.update(modifier)
+		button.set_modifier(modifier)
 
 
 # Utils
