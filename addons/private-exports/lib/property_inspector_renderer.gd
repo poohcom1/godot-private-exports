@@ -131,47 +131,39 @@ func _find_editor_properties(node: Node, callback: Callable):
 	for child in node.get_children():
 		if child is EditorProperty:
 			callback.call(child)
-		elif _is_empty_section(child):
+		elif child.is_class(&"EditorInspectorSection") and _is_empty_section(child):
 			child.hide()
-		elif _is_empty_category(child, node):
+		elif child.is_class(&"EditorInspectorCategory") and _is_empty_category(child, node):
 			child.hide()
 		else:
 			_find_editor_properties(child, callback)
 
 
 func _is_empty_category(category: Node, parent: Node) -> bool:
-	if not category.is_class(&"EditorInspectorCategory"):
-		return false
-
-	var found = false
 	for i in range(category.get_index() + 1, parent.get_child_count()):
 		var node = parent.get_child(i)
 
-		if not found and node.is_class(&"EditorInspectorCategory"):
+		if node.is_class(&"EditorInspectorCategory"):
 			return true
 		else:
 			for child in node.get_children():
-				if not _is_empty_section(child):
+				if child.is_class(&"EditorProperty"):
 					return false
-				else:
-					found = true
+				elif not _is_empty_section(child):
+					return false
 
 	return false
 
 
 func _is_empty_section(section: Node) -> bool:
-	if not section.is_class(&"EditorInspectorSection"):
-		return false
-
 	if section.get_child_count() == 0:
 		return true
 
-	var container = section.get_child(0)
-	if container.get_child_count() == 0:
-		return true
-	else:
-		for child in container.get_children():
-			if not _is_empty_section(child):
-				return false
+	for child in section.get_children():
+		if child.is_class(&"EditorProperty"):
+			return false
+		elif not _is_empty_section(child):
+			return false
+			
 
-	return false
+	return true

@@ -11,6 +11,7 @@ metadata/_access_modifiers = {
 "private_in_category_2": 2,
 "private_in_group_1": 2,
 "private_in_subgroup_1": 2,
+"private_in_subgroup_2": 2,
 "protected_export": 1,
 "public_export": 0
 }
