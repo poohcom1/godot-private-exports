@@ -9,6 +9,8 @@ metadata/_access_modifiers = {
 "private_export": 2,
 "private_in_category_1": 2,
 "private_in_category_2": 2,
+"private_in_group_1": 2,
+"private_in_subgroup_1": 2,
 "protected_export": 1,
 "public_export": 0
 }

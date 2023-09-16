@@ -28,8 +28,6 @@ static func set_access_modifier_with_undo(
 	undoredo.add_undo_property(object, "metadata/%s" % _MetaKey, old_access_modifiers)
 	undoredo.commit_action()
 
-	set_access_modifier(object, property, modifier)
-
 
 static func set_access_modifier(object: Object, property: StringName, modifier: AccessModifier):
 	var access_modifiers = object.get_meta(_MetaKey, {})
@@ -59,8 +57,7 @@ static func is_property_visible(object: Object, property: StringName) -> bool:
 		# Check scene parents
 		var metadatas = _get_parent_metadatas(object)
 
-		for i in range(1, metadatas.size()):
-			var metadata = metadatas[i]
+		for metadata in metadatas:
 			if property in metadata:
 				var modifier: AccessModifier = metadata[property]
 				if modifier == AccessModifier.Private:
@@ -74,24 +71,16 @@ static func is_property_visible(object: Object, property: StringName) -> bool:
 		if modifier == AccessModifier.Public:
 			return true
 
-		if modifier == AccessModifier.Private and EditorInterface.get_edited_scene_root() == object:
-			return true
-
 		return false
 
 
 static func is_current_property_owner(property: StringName) -> bool:
-	var script: Script = _get_script(EditorInterface.get_edited_scene_root())
-	if not script:
-		return true
+	var parent_scripts := _get_parent_scripts(EditorInterface.get_edited_scene_root())
 
-	var parent := script.get_base_script()
-	if not parent:
-		return true
-
-	for prop in parent.get_script_property_list():
-		if prop[&"name"] == property:
-			return false
+	for script in parent_scripts:
+		for prop in script.get_script_property_list():
+			if prop[&"name"] == property:
+				return false
 
 	return true
 
@@ -104,10 +93,17 @@ static var _cached_scene: String
 static func _get_script(node: Node) -> Script:
 	var scene_path = node.scene_file_path
 
+	if scene_path.is_empty():
+		return null
+
 	#if scene_path == _cached_scene and _cached_script:
 	#	return _cached_script
 
 	var packed_scene: PackedScene = load(node.scene_file_path)
+
+	if not packed_scene:
+		return null
+
 	var scene_state = packed_scene.get_state()
 
 	for i in scene_state.get_node_property_count(0):
@@ -152,3 +148,28 @@ static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
 	_cached_scene = scene_path
 
 	return _cached_scene_metadata
+
+
+static func _get_parent_scripts(node: Node) -> Array[Script]:
+	if node == null:
+		return []
+
+	var scene_path = node.scene_file_path
+
+	if scene_path.is_empty():
+		return []
+
+	var parent_scripts: Array[Script] = []
+
+	var parent_scene: PackedScene = load(scene_path).get_state().get_node_instance(0)
+	while parent_scene != null:
+		var scene_state := parent_scene.get_state()
+
+		for i in scene_state.get_node_property_count(0):
+			if scene_state.get_node_property_name(0, i) == &"script":
+				parent_scripts.append(scene_state.get_node_property_value(0, i))
+				break
+
+		parent_scene = scene_state.get_node_instance(0)
+
+	return parent_scripts

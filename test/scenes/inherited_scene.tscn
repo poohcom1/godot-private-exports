@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://dso752y28b1vf"]
+
+[ext_resource type="PackedScene" uid="uid://bx8gnmy8gtor5" path="res://test/scenes/base.tscn" id="1_wf4o3"]
+
+[node name="Inherited" instance=ExtResource("1_wf4o3")]
