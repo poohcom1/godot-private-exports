@@ -1,4 +1,4 @@
-## Deals with the metadata setting and retrieval
+## Core logic for creating
 
 const _MetaKey = "_access_modifiers"
 
@@ -15,7 +15,7 @@ const AccessModifierNames = [
 ]
 
 
-static func set_access_modifier_with_undo(
+func set_access_modifier_with_undo(
 	undoredo: EditorUndoRedoManager, object: Object, property: StringName, modifier: AccessModifier
 ) -> void:
 	var access_modifiers: Dictionary = object.get_meta(_MetaKey, {})
@@ -29,7 +29,7 @@ static func set_access_modifier_with_undo(
 	undoredo.commit_action()
 
 
-static func set_access_modifier(object: Object, property: StringName, modifier: AccessModifier):
+func set_access_modifier(object: Object, property: StringName, modifier: AccessModifier):
 	var access_modifiers = object.get_meta(_MetaKey, {})
 
 	access_modifiers[property] = modifier
@@ -37,7 +37,7 @@ static func set_access_modifier(object: Object, property: StringName, modifier: 
 	object.set_meta(_MetaKey, access_modifiers)
 
 
-static func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
+func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
 	var metadatas := _get_metadatas(object as Node)
 
 	for metadata in metadatas:
@@ -47,7 +47,7 @@ static func get_access_modifier(object: Object, property: StringName) -> AccessM
 	return AccessModifier.Public
 
 
-static func is_property_visible(object: Object, property: StringName) -> bool:
+func is_property_visible(object: Object, property: StringName) -> bool:
 	if object == EditorInterface.get_edited_scene_root():
 		# Check scene parents
 		var metadatas = _get_metadatas(object)
@@ -69,12 +69,12 @@ static func is_property_visible(object: Object, property: StringName) -> bool:
 		return false
 
 
-static func invalidate_cache():
+func invalidate_cache():
 	_cached_scene_path = ""
 	_cached_packed_scene = null
 
 
-static func is_current_property_owner(property: StringName) -> bool:
+func is_current_property_owner(property: StringName) -> bool:
 	var parent_scripts := _get_parent_scripts(EditorInterface.get_edited_scene_root())
 
 	for script in parent_scripts:
@@ -86,11 +86,11 @@ static func is_current_property_owner(property: StringName) -> bool:
 
 
 ## Utils
-static var _cached_scene_path: String = ""
-static var _cached_packed_scene: PackedScene = null
+var _cached_scene_path: String = ""
+var _cached_packed_scene: PackedScene = null
 
 
-static func _get_metadatas(node: Node) -> Array[Dictionary]:
+func _get_metadatas(node: Node) -> Array[Dictionary]:
 	var scene_path = node.scene_file_path
 
 	if scene_path.is_empty():
@@ -107,17 +107,22 @@ static func _get_metadatas(node: Node) -> Array[Dictionary]:
 	while scene != null:
 		var scene_state := scene.get_state()
 
+		var found = false
 		for i in scene_state.get_node_property_count(0):
 			if scene_state.get_node_property_name(0, i) == &"metadata/%s" % _MetaKey:
 				metadatas.append(scene_state.get_node_property_value(0, i))
+				found = true
 				break
+
+		if not found:
+			metadatas.append({})
 
 		scene = scene_state.get_node_instance(0)
 
 	return metadatas
 
 
-static func _get_parent_scripts(node: Node) -> Array[Script]:
+func _get_parent_scripts(node: Node) -> Array[Script]:
 	if node == null:
 		return []
 

@@ -22,10 +22,6 @@ static func init():
 	)
 
 
-static func terminate():
-	pass  # Don't erase settings because it will reset
-
-
 # Settings
 static func get_display_mode() -> DisplayMode:
 	return EditorInterface.get_editor_settings().get_setting(DisplayModeKey)

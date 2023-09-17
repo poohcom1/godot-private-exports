@@ -12,14 +12,16 @@ const ButtonGroupName = &"__private_exports_buttons"
 
 
 var _editor_plugin: EditorPlugin
+var _core: Core
 
 var _object: Node = null
 ## Dictionary[StringName, AccessModifierButton]
 var _buttons: Dictionary = {}
 
 
-func _init(editor_plugin: EditorPlugin):
+func _init(editor_plugin: EditorPlugin, core: Core):
 	_editor_plugin = editor_plugin
+	_core = core
 	EditorInterface.get_inspector().edited_object_changed.connect(_draw)
 	EditorInterface.get_editor_settings().settings_changed.connect(_update_buttons)
 	
@@ -34,7 +36,7 @@ func terminate() -> void:
 
 # Initial Rendering
 func _draw():
-	Core.invalidate_cache()
+	_core.invalidate_cache()
 	_object = EditorInterface.get_edited_scene_root()
 	_buttons = {}
 	_find_editor_properties(EditorInterface.get_inspector(), _draw_button)
@@ -51,13 +53,13 @@ func _draw_button(editor_property: EditorProperty):
 	if script == null:
 		return  # Not a custom object
 
-	var is_owner = Core.is_current_property_owner(property)
+	var is_owner = _core.is_current_property_owner(property)
 
 	var properties = script.get_script_property_list()
 	if not properties.any(func(e): return e.name == editor_property.get_edited_property()):
 		return  # No custom properties
 
-	var access_modifier = Core.get_access_modifier(object, property)
+	var access_modifier = _core.get_access_modifier(object, property)
 
 	# Draw
 	var editor_control: Control = editor_property.get_child(0)
@@ -67,7 +69,7 @@ func _draw_button(editor_property: EditorProperty):
 	button.set_modifier(access_modifier)
 	button.changed.connect(
 		func(modifier: Core.AccessModifier): 
-			Core.set_access_modifier_with_undo(
+			_core.set_access_modifier_with_undo(
 				_editor_plugin.get_undo_redo(), object, property, modifier
 			)
 			_update_buttons()
@@ -115,7 +117,7 @@ func _draw_button(editor_property: EditorProperty):
 # Updating
 func _update_button(button: AccessModifierButton, object: Object, property: StringName):
 	var display_mode := Configs.get_display_mode()
-	var modifier := Core.get_access_modifier(object, property)
+	var modifier := _core.get_access_modifier(object, property)
 
 	button.set_modifier(modifier)
 
