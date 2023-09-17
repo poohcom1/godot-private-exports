@@ -10,11 +10,12 @@ An addon that adds access modifiers to exported variables in scenes. This can be
 - `Private`: Private exported properties are only visible in the base scene.
 - `Protected`: Protected exported properties are only visible in base scene and its inheritors.
 
-| Player.tscn                                            | Level.tscn                                                |
-| ------------------------------------------------------ | --------------------------------------------------------- |
-| ![Example of base scene](screenshots/example_base.png) | ![Example of ext scene](screenshots/example_external.png) |
+| Actor.tscn                                             | Player.tscn (extends Actor)                                      | Level.tscn                                                |
+| ------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------- |
+| ![Example of base scene](screenshots/example_base.png) | ![Example of inherited scene](screenshots/example_inherited.png) | ![Example of ext scene](screenshots/example_external.png) |
 
-> _Private exports are not visible in Level.tscn_
+> - Private exports are not visible anywhere else
+> - Protected exports are visible in inheritors (Player)
 
 Access modifiers are only applied to _scenes_, not _scripts_. They are meant for packed scenes which are being used in other scenes that may want certain exports to not be visible.
 
