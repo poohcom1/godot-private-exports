@@ -6,9 +6,9 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 
 ## Access Modifiers
 
-- `Public`: Public exported properties are always visible.
-- `Private`: Private exported properties are only visible in the base scene.
-- `Protected`: Protected exported properties are only visible in the base scene and its inheritors.
+- `Public`: Public exports are always visible.
+- `Private`: Private exports are only visible in the base scene.
+- `Protected`: Protected exports are only visible in the base scene and its inheritors.
 
 | Actor.tscn                                             | Player.tscn (extends Actor)                                      | Level.tscn                                                |
 | ------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------- |
@@ -16,9 +16,7 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 
 > Private and protected exports can be used to fine-tune how exports are shown in other scenes.
 
-Access modifiers are only applied to _scenes_, not _scripts_. They are meant for packed scenes that are being used in other scenes that may want certain exports not to be visible.
-
-For example, `Player.tscn` scene with an `Player.gd` script may have the `speed` property private. However, if `Player.gd` is used elsewhere, the `speed` export there is considered unrelated and will have its own access modifiers.
+Access modifiers are only applied to _scenes_, not _scripts_. They are used for hiding exports when scenes are instantiated in other scenes. As such, they are not connected to scripts. For example, `Player.tscn` scene with an `Player.gd` script may have the `speed` property private. However, if `Player.gd` is used elsewhere, the `speed` export there is considered unrelated and will have its own access modifiers.
 
 ## Editor Settings
 
