@@ -1,5 +1,7 @@
 # Godot Private Exports
 
+[<img src="https://img.shields.io/static/v1?label=GODOT%204.2&message=Asset%20Library&color=478CBF&labelColor=FFFFFF&style=for-the-badge&logo=godotengine">](https://godotengine.org/asset-library/asset/8918)
+
 A Godot addon that adds access modifiers to exported variables in scenes. This can be used to prevent changes to exported variables that are only meant to be modified in the base scene or reduce clutter from the inspector.
 
 ![Example of inspector](screenshots/inspector.png)
