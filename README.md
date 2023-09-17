@@ -14,8 +14,7 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 | ------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------- |
 | ![Example of base scene](screenshots/example_base.png) | ![Example of inherited scene](screenshots/example_inherited.png) | ![Example of ext scene](screenshots/example_external.png) |
 
-> - Private exports are not visible anywhere else
-> - Protected exports are visible in inheritors (Player)
+> Private and protected exports and be use to fine tune how exports are shown in other scenes.
 
 Access modifiers are only applied to _scenes_, not _scripts_. They are meant for packed scenes which are being used in other scenes that may want certain exports to not be visible.
 
