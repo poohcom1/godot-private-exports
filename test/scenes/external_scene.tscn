@@ -5,3 +5,13 @@
 [node name="ExternalScene" type="Node2D"]
 
 [node name="Base" parent="." instance=ExtResource("1_kr8y3")]
+metadata/_access_modifiers = {
+"private_export": 2,
+"private_in_category_1": 2,
+"private_in_category_2": 2,
+"private_in_group_1": 2,
+"private_in_subgroup_1": 2,
+"private_in_subgroup_2": 2,
+"protected_export": 0,
+"public_export": 0
+}

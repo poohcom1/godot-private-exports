@@ -38,14 +38,9 @@ static func set_access_modifier(object: Object, property: StringName, modifier: 
 
 
 static func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
-	var object_metadata = object.get_meta(_MetaKey, {})
+	var metadatas := _get_metadatas(object as Node)
 
-	if property in object_metadata:
-		return object_metadata[property]
-
-	var parent_metadatas := _get_parent_metadatas(object as Node)
-
-	for metadata in parent_metadatas:
+	for metadata in metadatas:
 		if property in metadata and metadata[property]:
 			return metadata[property]
 
@@ -55,9 +50,9 @@ static func get_access_modifier(object: Object, property: StringName) -> AccessM
 static func is_property_visible(object: Object, property: StringName) -> bool:
 	if object == EditorInterface.get_edited_scene_root():
 		# Check scene parents
-		var metadatas = _get_parent_metadatas(object)
+		var metadatas = _get_metadatas(object)
 
-		for metadata in metadatas:
+		for metadata in metadatas.slice(1):
 			if property in metadata:
 				var modifier: AccessModifier = metadata[property]
 				if modifier == AccessModifier.Private:
@@ -95,7 +90,7 @@ static var _cached_scene_path: String = ""
 static var _cached_packed_scene: PackedScene = null
 
 
-static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
+static func _get_metadatas(node: Node) -> Array[Dictionary]:
 	var scene_path = node.scene_file_path
 
 	if scene_path.is_empty():
@@ -107,16 +102,17 @@ static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
 
 	# Generate
 	var metadatas: Array[Dictionary] = []
-	var parent_scene: PackedScene = _cached_packed_scene.get_state().get_node_instance(0)
-	while parent_scene != null:
-		var scene_state := parent_scene.get_state()
+	var scene := _cached_packed_scene
+
+	while scene != null:
+		var scene_state := scene.get_state()
 
 		for i in scene_state.get_node_property_count(0):
 			if scene_state.get_node_property_name(0, i) == &"metadata/%s" % _MetaKey:
 				metadatas.append(scene_state.get_node_property_value(0, i))
 				break
 
-		parent_scene = scene_state.get_node_instance(0)
+		scene = scene_state.get_node_instance(0)
 
 	return metadatas
 
