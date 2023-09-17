@@ -1,6 +1,6 @@
 # Godot Private Exports
 
-An addon that adds access modifiers to exported variables in scenes. This can be use to prevent changes to exported variables that are only meant to be modified in the base scene or keep inspectors clean when instantiating scenes.
+A Godot addon that adds access modifiers to exported variables in scenes. This can be use to prevent changes to exported variables that are only meant to be modified in the base scene or keep inspectors clean when instantiating scenes.
 
 ![Example of inspector](screenshots/inspector.png)
 
@@ -25,4 +25,4 @@ For example, a, `Player.tscn` scene with an `Player.gd` script may have the `spe
 
 | Setting      | Description                                                                                                                                                      | Default |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| Display Mode | **Always**: modifier always shown <br /> **Selected**: only shown on focused properties <br /> **Modified**: only showned when focused on on modified properties | Always  |
+| Display Mode | `Always`: modifier always shown <br /> `Selected`: only shown on selected properties <br /> `Modified`: only shown on modified and selected properties | `Always`  |
