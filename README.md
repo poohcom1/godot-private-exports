@@ -6,6 +6,12 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 
 ![Example of inspector](screenshots/inspector.png)
 
+## Usage
+
+1. Install the addon from the AssetLib.
+2. Activate the plugin from Project Settings > Plugin.
+3. Navigate to the root node of a scene with a script and the inspector will have an extra dropdown to choose access modifiers.
+
 ## Access Modifiers
 
 - `Public`: Public exports are always visible.
