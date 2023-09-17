@@ -23,10 +23,7 @@ static func init():
 
 
 static func terminate():
-	#var settings := EditorInterface.get_editor_settings()
-
-	#settings.erase(DisplayModeKey)
-	pass
+	pass  # Don't erase settings because it will reset
 
 
 # Settings

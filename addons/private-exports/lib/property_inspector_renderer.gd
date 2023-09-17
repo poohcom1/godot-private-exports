@@ -91,12 +91,7 @@ func _draw_button(editor_property: EditorProperty):
 
 	button.disabled = not is_owner
 
-	if display_mode == DisplayMode.Selected:
-		button.hide()
-	elif display_mode == DisplayMode.Modified and access_modifier == AccessModifier.Public:
-		button.hide()
-	else:
-		button.show()
+	_update_button(button, object, property)
 
 	editor_property.selected.connect(
 		func(_path: String, _focusable_idx: int):
@@ -118,13 +113,27 @@ func _draw_button(editor_property: EditorProperty):
 
 
 # Updating
+func _update_button(button: AccessModifierButton, object: Object, property: StringName):
+	var display_mode := Configs.get_display_mode()
+	var modifier := Core.get_access_modifier(object, property)
+
+	button.set_modifier(modifier)
+
+	if display_mode == DisplayMode.Selected:
+		button.hide()
+	elif display_mode == DisplayMode.Modified and modifier == AccessModifier.Public:
+		button.hide()
+	else:
+		button.show()
+
+
 func _update_buttons():
 	if not _object: return
+
+	var display_mode := Configs.get_display_mode()
 	
 	for property in _buttons:
-		var modifier := Core.get_access_modifier(_object, property)
-		var button = _buttons[property]
-		button.set_modifier(modifier)
+		_update_button(_buttons[property], _object, property)
 
 
 # Utils
