@@ -7,10 +7,6 @@ const AccessModifierButton := preload("../controls/access_modifier_button.gd")
 const AccessModifier = Core.AccessModifier
 const DisplayMode = Configs.DisplayMode
 
-const ContainerGroupName = &"__private_exports_containers"
-const ButtonGroupName = &"__private_exports_buttons"
-
-
 var _editor_plugin: EditorPlugin
 var _core: Core
 
@@ -27,7 +23,8 @@ func _init(editor_plugin: EditorPlugin, core: Core):
 	
 	_editor_plugin.get_undo_redo().version_changed.connect(_update_buttons)
 
-	_draw()
+	EditorInterface.inspect_object.call_deferred(null)
+	EditorInterface.inspect_object.call_deferred(_object)
 
 
 func terminate() -> void:
@@ -58,8 +55,8 @@ func _draw_button(editor_property: EditorProperty):
 	if script == null:
 		return  # Not a custom object
 
-	if property in _buttons:
-		return  # Already drawn (shouldn't happen but just in case)
+	#if property in _buttons:
+	#	return  # Already drawn (shouldn't happen but just in case)
 
 	var is_owner = _core.is_current_property_owner(property)
 
@@ -73,14 +70,13 @@ func _draw_button(editor_property: EditorProperty):
 	var editor_control: Control = editor_property.get_child(0)
 	var container: HBoxContainer
 	var button := AccessModifierButton.new()
-	button.add_to_group(ButtonGroupName)
 	button.set_modifier(access_modifier)
 	button.changed.connect(
 		func(modifier: Core.AccessModifier): 
-			_core.set_access_modifier_with_undo(
+			_core.set_access_modifier(
 				_editor_plugin.get_undo_redo(), object, property, modifier
 			)
-			_update_buttons()
+			_update_button(button, object, property)
 	)
 	_buttons[property] = button
 
@@ -89,7 +85,6 @@ func _draw_button(editor_property: EditorProperty):
 	)
 
 	container = HBoxContainer.new()
-	container.add_to_group(ContainerGroupName)
 	editor_control.reparent(container)
 	container.add_child(button)
 
@@ -106,9 +101,7 @@ func _draw_button(editor_property: EditorProperty):
 	editor_property.selected.connect(
 		func(_path: String, _focusable_idx: int):
 			# Hide other buttons
-			var buttons = EditorInterface.get_base_control().get_tree().get_nodes_in_group(ButtonGroupName)
-			
-			for b in buttons:
+			for b in _buttons.values():
 				if display_mode == DisplayMode.Selected:
 					b.hide()
 				elif display_mode == DisplayMode.Modified and b.get_modifier() == AccessModifier.Public:
@@ -138,8 +131,6 @@ func _update_button(button: AccessModifierButton, object: Object, property: Stri
 
 
 func _update_buttons():
-	if not _object: return
-
 	var display_mode := Configs.get_display_mode()
 	
 	for property in _buttons:

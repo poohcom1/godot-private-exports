@@ -15,10 +15,11 @@ const AccessModifierNames = [
 ]
 
 
-func set_access_modifier_with_undo(
+func set_access_modifier(
 	undoredo: EditorUndoRedoManager, object: Object, property: StringName, modifier: AccessModifier
 ) -> void:
-	var access_modifiers: Dictionary = object.get_meta(_MetaKey, {})
+	var metadatas := _get_modifier_metadatas(object as Node)
+	var access_modifiers: Dictionary = metadatas[0] if metadatas.size() > 0 else {}
 
 	var old_access_modifiers: Dictionary = access_modifiers.duplicate()
 	access_modifiers[property] = modifier
@@ -29,16 +30,8 @@ func set_access_modifier_with_undo(
 	undoredo.commit_action()
 
 
-func set_access_modifier(object: Object, property: StringName, modifier: AccessModifier):
-	var access_modifiers = object.get_meta(_MetaKey, {})
-
-	access_modifiers[property] = modifier
-
-	object.set_meta(_MetaKey, access_modifiers)
-
-
 func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
-	var metadatas := _get_metadatas(object as Node)
+	var metadatas := _get_modifier_metadatas(object as Node)
 
 	for metadata in metadatas:
 		if property in metadata and metadata[property]:
@@ -50,7 +43,7 @@ func get_access_modifier(object: Object, property: StringName) -> AccessModifier
 func is_property_visible(object: Object, property: StringName) -> bool:
 	if object == EditorInterface.get_edited_scene_root():
 		# Check scene parents
-		var metadatas = _get_metadatas(object)
+		var metadatas = _get_modifier_metadatas(object)
 
 		for metadata in metadatas.slice(1):
 			if property in metadata:
@@ -90,7 +83,7 @@ var _cached_scene_path: String = ""
 var _cached_packed_scene: PackedScene = null
 
 
-func _get_metadatas(node: Node) -> Array[Dictionary]:
+func _get_modifier_metadatas(node: Node) -> Array[Dictionary]:
 	var scene_path = node.scene_file_path
 
 	if scene_path.is_empty():

@@ -1,3 +1,4 @@
+@tool
 extends Button
 
 const Core := preload("../lib/core.gd")
