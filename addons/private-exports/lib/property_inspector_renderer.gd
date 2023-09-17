@@ -23,8 +23,7 @@ func _init(editor_plugin: EditorPlugin, core: Core):
 	
 	_editor_plugin.get_undo_redo().version_changed.connect(_update_buttons)
 
-	EditorInterface.inspect_object.call_deferred(null)
-	EditorInterface.inspect_object.call_deferred(_object)
+	_draw()
 
 
 func terminate() -> void:
