@@ -74,6 +74,11 @@ static func is_property_visible(object: Object, property: StringName) -> bool:
 		return false
 
 
+static func invalidate_cache():
+	_cached_scene_path = ""
+	_cached_packed_scene = null
+
+
 static func is_current_property_owner(property: StringName) -> bool:
 	var parent_scripts := _get_parent_scripts(EditorInterface.get_edited_scene_root())
 
@@ -86,38 +91,8 @@ static func is_current_property_owner(property: StringName) -> bool:
 
 
 ## Utils
-static var _cached_script: Script = null
-static var _cached_scene: String
-
-
-static func _get_script(node: Node) -> Script:
-	var scene_path = node.scene_file_path
-
-	if scene_path.is_empty():
-		return null
-
-	#if scene_path == _cached_scene and _cached_script:
-	#	return _cached_script
-
-	var packed_scene: PackedScene = load(node.scene_file_path)
-
-	if not packed_scene:
-		return null
-
-	var scene_state = packed_scene.get_state()
-
-	for i in scene_state.get_node_property_count(0):
-		if scene_state.get_node_property_name(0, i) == &"script":
-			_cached_script = scene_state.get_node_property_value(0, i)
-			break
-
-	_cached_scene = scene_path
-
-	return _cached_script
-
-
-#static var _cached_scene_hierarchy: Array[PackedScene] = []
-static var _cached_scene_metadata: Array[Dictionary] = []
+static var _cached_scene_path: String = ""
+static var _cached_packed_scene: PackedScene = null
 
 
 static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
@@ -126,28 +101,24 @@ static func _get_parent_metadatas(node: Node) -> Array[Dictionary]:
 	if scene_path.is_empty():
 		return []
 
-	#if scene_path == _cached_scene and not _cached_scene_metadata.is_empty():
-	#	return _cached_scene_metadata
+	if scene_path != _cached_scene_path:
+		_cached_scene_path = scene_path
+		_cached_packed_scene = load(scene_path)
 
 	# Generate
-	_cached_scene_metadata = []
-
-	var parent_scene: PackedScene = load(scene_path).get_state().get_node_instance(0)
+	var metadatas: Array[Dictionary] = []
+	var parent_scene: PackedScene = _cached_packed_scene.get_state().get_node_instance(0)
 	while parent_scene != null:
-		#_cached_scene_hierarchy.append(parent_scene)
-
 		var scene_state := parent_scene.get_state()
 
 		for i in scene_state.get_node_property_count(0):
 			if scene_state.get_node_property_name(0, i) == &"metadata/%s" % _MetaKey:
-				_cached_scene_metadata.append(scene_state.get_node_property_value(0, i))
+				metadatas.append(scene_state.get_node_property_value(0, i))
 				break
 
 		parent_scene = scene_state.get_node_instance(0)
 
-	_cached_scene = scene_path
-
-	return _cached_scene_metadata
+	return metadatas
 
 
 static func _get_parent_scripts(node: Node) -> Array[Script]:
@@ -159,9 +130,13 @@ static func _get_parent_scripts(node: Node) -> Array[Script]:
 	if scene_path.is_empty():
 		return []
 
+	if scene_path != _cached_scene_path:
+		_cached_scene_path = scene_path
+		_cached_packed_scene = load(scene_path)
+
 	var parent_scripts: Array[Script] = []
 
-	var parent_scene: PackedScene = load(scene_path).get_state().get_node_instance(0)
+	var parent_scene: PackedScene = _cached_packed_scene.get_state().get_node_instance(0)
 	while parent_scene != null:
 		var scene_state := parent_scene.get_state()
 

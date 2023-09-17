@@ -34,6 +34,7 @@ func terminate() -> void:
 
 # Initial Rendering
 func _draw():
+	Core.invalidate_cache()
 	_object = EditorInterface.get_edited_scene_root()
 	_buttons = {}
 	_find_editor_properties(EditorInterface.get_inspector(), _draw_button)
