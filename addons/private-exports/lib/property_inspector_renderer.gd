@@ -27,11 +27,16 @@ func _init(editor_plugin: EditorPlugin, core: Core):
 	
 	_editor_plugin.get_undo_redo().version_changed.connect(_update_buttons)
 
+	_draw()
+
 
 func terminate() -> void:
 	EditorInterface.get_inspector().edited_object_changed.disconnect(_draw)
 	EditorInterface.get_editor_settings().settings_changed.disconnect(_update_buttons)
 	_editor_plugin.get_undo_redo().version_changed.disconnect(_update_buttons)
+
+	EditorInterface.inspect_object(null)
+	EditorInterface.inspect_object(_object)
 
 
 # Initial Rendering
@@ -52,6 +57,9 @@ func _draw_button(editor_property: EditorProperty):
 
 	if script == null:
 		return  # Not a custom object
+
+	if property in _buttons:
+		return  # Already drawn (shouldn't happen but just in case)
 
 	var is_owner = _core.is_current_property_owner(property)
 
