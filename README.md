@@ -18,7 +18,7 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 
 **Q: Why don't I see the access modifier buttons?**
 
-A: Make sure you're at the root node of a scene and that the root node has exported variables. Since only root node exports are visible in other scenes, only these variables can have access modifiers.
+A: Make sure you're at the root node of a scene. Since only root node exports are visible in other scenes, only these variables can have access modifiers.
 
 **Q: Why are access modifier from one scene not the same as another scene with the same script?**
 
