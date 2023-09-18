@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://hrmvgc5a8pcq"]
+
+[ext_resource type="PackedScene" uid="uid://bx8gnmy8gtor5" path="res://test/scenes/base.tscn" id="1_an25k"]
+[ext_resource type="Script" path="res://test/scenes/inherited_script.gd" id="2_54fui"]
+
+[node name="InheritedScript" instance=ExtResource("1_an25k")]
+script = ExtResource("2_54fui")
+inherted_export = 0

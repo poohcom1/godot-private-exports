@@ -68,9 +68,26 @@ func invalidate_cache():
 
 
 func is_current_property_owner(property: StringName) -> bool:
-	var parent_scripts := _get_parent_scripts(EditorInterface.get_edited_scene_root())
+	var object := EditorInterface.get_edited_scene_root()
+	var scripts := _get_scripts(object)
 
-	for script in parent_scripts:
+	# Check current script
+	var is_inherited_scene: bool = scripts.size() > 1
+	var found := false
+
+	if is_inherited_scene:
+		var script = scripts[0]
+		for prop in script.get_script_property_list():
+			if prop[&"name"] == property:
+				found = true
+				break
+
+	if not found and is_inherited_scene:
+		return false  # Is a native property and the current script is inherited
+
+	# Check parent scripts
+	for i in range(1, scripts.size()):
+		var script = scripts[i]
 		for prop in script.get_script_property_list():
 			if prop[&"name"] == property:
 				return false
@@ -83,6 +100,7 @@ var _cached_scene_path: String = ""
 var _cached_packed_scene: PackedScene = null
 
 
+## Returns an array of Dictionary of modifiers for the node and its parents
 func _get_modifier_metadatas(node: Node) -> Array[Dictionary]:
 	var scene_path = node.scene_file_path
 
@@ -115,7 +133,8 @@ func _get_modifier_metadatas(node: Node) -> Array[Dictionary]:
 	return metadatas
 
 
-func _get_parent_scripts(node: Node) -> Array[Script]:
+## Returns an array of scripts for the node and its parents
+func _get_scripts(node: Node) -> Array[Script]:
 	if node == null:
 		return []
 
@@ -128,17 +147,32 @@ func _get_parent_scripts(node: Node) -> Array[Script]:
 		_cached_scene_path = scene_path
 		_cached_packed_scene = load(scene_path)
 
-	var parent_scripts: Array[Script] = []
+	var scripts: Array[Script] = []
 
-	var parent_scene: PackedScene = _cached_packed_scene.get_state().get_node_instance(0)
-	while parent_scene != null:
-		var scene_state := parent_scene.get_state()
+	var scene: PackedScene = _cached_packed_scene
+	while scene != null:
+		var scene_state := scene.get_state()
 
+		var found = false
 		for i in scene_state.get_node_property_count(0):
 			if scene_state.get_node_property_name(0, i) == &"script":
-				parent_scripts.append(scene_state.get_node_property_value(0, i))
+				scripts.append(scene_state.get_node_property_value(0, i))
+				found = true
 				break
 
-		parent_scene = scene_state.get_node_instance(0)
+		if not found:
+			scripts.append(null)
 
-	return parent_scripts
+		scene = scene_state.get_node_instance(0)
+
+	# Replace nulls with the parent script
+	var current_script: Script = null
+	for i in range(scripts.size() - 1, -1, -1):
+		var script := scripts[i]
+
+		if script:
+			current_script = script
+		else:
+			scripts[i] = current_script
+
+	return scripts

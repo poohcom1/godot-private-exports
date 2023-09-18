@@ -11,6 +11,8 @@ enum DisplayMode {
 static func init():
 	var settings := EditorInterface.get_editor_settings()
 
+	if not settings.has_setting(DisplayModeKey):
+		settings.set_setting(DisplayModeKey, DisplayMode.Always)
 	settings.set_initial_value(DisplayModeKey, DisplayMode.Always, false)
 	settings.add_property_info(
 		{
