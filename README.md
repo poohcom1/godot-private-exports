@@ -6,6 +6,10 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 
 ![Example of inspector](screenshots/inspector.png)
 
+## Requirements
+
+[Godot 4.2 dev 4](https://godotengine.org/article/dev-snapshot-godot-4-2-dev-4/)+
+
 ## Usage
 
 1. Install the addon from the AssetLib.
