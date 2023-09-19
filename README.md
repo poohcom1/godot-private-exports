@@ -21,7 +21,8 @@ A Godot addon that adds access modifiers to exported variables in scenes. This c
 ## FAQ
 
 **Q: Why aren't the access modifiers updating when I updated the script?**
-A: Since these are stored as metadata in the scene, sometimes the loaded scene may go out of sync with the file. Try to save and/or reopen the scene.
+
+A: Since these are stored as metadata in the scene, sometimes the loaded scene may go out of sync with the file. Try saving and reopening the scene to see if it resolves the issue.
 
 **Q: Why don't I see the access modifier buttons?**
 
@@ -29,7 +30,7 @@ A: Make sure you're at the root node of a scene. Since only root node exports ar
 
 **Q: Why are access modifiers from one scene not the same as another scene with the same script?**
 
-A: The addon is designed around scenes, not scripts. Scenes can be treated as "classes" and scenes in other trees are treated as "instances". This is the reason `Protected` variables apply to inherited scenes, not inherited scripts. If you are looking for an addon that hides properties based on scripts, check out [Hide Private Properties](https://godotengine.org/asset-library/asset/1989).
+A: The addon is designed around scenes, not scripts. Scenes can be treated as "classes" and scenes in other trees are treated as "instances". This is the reason `Protected` variables apply to inherited scenes, not inherited scripts. If you are looking for an addon that hides properties based on scripts, check out [Hide Private Properties](https://godotengine.org/asset-library/asset/1989), which hides properties that begins with an underscore.
 
 ## Access Modifiers
 
