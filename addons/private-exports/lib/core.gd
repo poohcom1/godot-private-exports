@@ -102,6 +102,9 @@ var _cached_packed_scene: PackedScene = null
 
 ## Returns an array of Dictionary of modifiers for the node and its parents
 func _get_modifier_metadatas(node: Node) -> Array[Dictionary]:
+	if not node:
+		return []
+	
 	var scene_path = node.scene_file_path
 
 	if scene_path.is_empty():
