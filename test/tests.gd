@@ -59,4 +59,5 @@ func test_external_broken_properties():
 	var root := ExternalBrokenScene.instantiate()
 	var base = root.get_node("Base")
 	
-	assert(plugin.is_property_visible(root, base, "private_export") == true, "Broken properties should be visible")
+	assert(plugin.is_overwriting_default(root, base, "protected_export") == false, "Non-modified private value should not be detected")
+	assert(plugin.is_overwriting_default(root, base, "private_export") == true, "Modified private value should not be detected")

@@ -67,7 +67,7 @@ func invalidate_cache():
 
 
 func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
-	var scenes := _get_scene_data(scene_root)
+	var scenes := _get_scene_data(scene_root, true)
 
 	# Check current script
 	var is_inherited_scene: bool = scenes.size() > 1
@@ -96,30 +96,38 @@ func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
 
 
 func is_overwriting_default(scene_root: Node, object: Object, property: StringName) -> bool:
-	var scenes := _get_scene_data(object)
+	var scenes := _get_scene_data(object) # Check memory because values are set from the scene
 	
 	if len(scenes) == 0:
 		return false
-	
-	var value = scenes[0].default_values[property]
-	
-	if object == scene_root:
-		return false
-	else:
-		# Just check the object
-		var modifier := get_access_modifier(object, property)
 		
-		if modifier == AccessModifier.Public:
-			return true
+	var value = object.get(property)
+	
+	var first_scene = true
+	
+	for scene in scenes:
+		if first_scene and scene_root == object:
+			first_scene = false
+			continue
 		
-		return false
+		if property in scene.metadata:
+			var modifier: AccessModifier = scene.metadata[property]
+			
+			if modifier != AccessModifier.Public and property in scene.scene_properties:
+				var default_value = scene.scene_properties[property]
+				if default_value != value:
+					return true
+			else:
+				return false
+	
+	return false
 
 
 ## Utils
 var _cached_scene_path: String = ""
 var _cached_packed_scene: PackedScene = null
 
-func _get_scene_data(node: Node, is_root: bool = false) -> Array[CachedSceneData]:
+func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneData]:
 	if node == null: return []
 	var scene_path = node.scene_file_path
 	if scene_path.is_empty(): return []
@@ -131,15 +139,16 @@ func _get_scene_data(node: Node, is_root: bool = false) -> Array[CachedSceneData
 	var scene_data_arr: Array[CachedSceneData] = []
 	var scene := _cached_packed_scene
 	
-	if is_root:
+	if in_memory:
+		# If it's the scene root, load from memory instead of scene,
+		#	because the value may have been modified
 		var current_scene = CachedSceneData.new()
-		current_scene.metadata = node.get_meta(_MetaKey)
+		if node.has_meta(_MetaKey):
+			current_scene.metadata = node.get_meta(_MetaKey)
 		current_scene.scene_script = node.get_script()
-		current_scene.default_values = {}
-		var current_scene_state := _cached_packed_scene.get_state()
-		for i in current_scene_state.get_node_property_count(0):
-			current_scene.default_values[current_scene_state.get_node_property_name(0, i)] = current_scene_state.get_node_property_value(0, i)
-
+		for prop in node.get_property_list():
+			current_scene.scene_properties[prop.name] = node.get(prop.name)
+		
 		scene_data_arr.append(current_scene)
 
 		scene = _cached_packed_scene.get_state().get_node_instance(0)
@@ -158,7 +167,7 @@ func _get_scene_data(node: Node, is_root: bool = false) -> Array[CachedSceneData
 			elif prop == &"script":
 				scene_data.scene_script = val
 			else:
-				scene_data.default_values[prop] = val
+				scene_data.scene_properties[prop] = val
 
 		scene = scene_state.get_node_instance(0)
 		scene_data_arr.append(scene_data)
@@ -166,16 +175,22 @@ func _get_scene_data(node: Node, is_root: bool = false) -> Array[CachedSceneData
 	# Replace null scripts with the parent script
 	var current_script: Script = null
 	for i in range(scene_data_arr.size() - 1, -1, -1):
-		var script := scene_data_arr[i].scene_script
+		var scene_data := scene_data_arr[i]
+		var script := scene_data.scene_script
 
 		if script:
 			current_script = script
 		else:
 			scene_data_arr[i].scene_script = current_script
+	
+		for prop in current_script.get_script_property_list():
+			if not prop.name in scene_data.scene_properties:
+				scene_data.scene_properties[prop.name] = scene_data.scene_script.get_property_default_value(prop.name)
+		
 
 	return scene_data_arr
 
 class CachedSceneData:
 	var scene_script: Script = null
 	var metadata := {}
-	var default_values := {}
+	var scene_properties := {}

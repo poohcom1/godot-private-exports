@@ -22,4 +22,10 @@ func _parse_property(
 	usage_flags: int,
 	wide: bool
 ) -> bool:
-	return not _core.is_property_visible(EditorInterface.get_edited_scene_root(), object, name)
+	var visible := _core.is_property_visible(EditorInterface.get_edited_scene_root(), object, name)
+	
+	if not visible and _core.is_overwriting_default(EditorInterface.get_edited_scene_root(), object, name):
+		push_warning("[Private Exports] %s.%s is a non-public property, but its value has been modified." % [object.name, name])
+		return false
+	
+	return not visible
