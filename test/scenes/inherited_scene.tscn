@@ -4,4 +4,4 @@
 
 [node name="Inherited" instance=ExtResource("1_wf4o3")]
 public_export = 5
-protected_export = 5
+protected_export = 10

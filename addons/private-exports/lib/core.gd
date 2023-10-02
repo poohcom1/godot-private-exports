@@ -105,17 +105,28 @@ func is_overwriting_default(scene_root: Node, object: Object, property: StringNa
 	var value = object.get(property)
 	
 	var first_scene = true
+	var scene_value = null # Value from inheriting scenes
 	
 	for scene in scenes:
 		if first_scene and scene_root == object:
 			first_scene = false
 			continue
+			
+		var default_value = null
+		if property in scene.scene_properties:
+			default_value = scene.scene_properties[property]
+			
+			if scene_value == null:
+				scene_value = default_value
 		
 		if property in scene.metadata:
 			var modifier: AccessModifier = scene.metadata[property]
 			
-			if (modifier == AccessModifier.Private or modifier == AccessModifier.Protected and scene_root != object) and property in scene.scene_properties:
-				var default_value = scene.scene_properties[property]
+			if (modifier == AccessModifier.Private or modifier == AccessModifier.Protected and scene_root != object) and default_value != null:
+				if modifier == AccessModifier.Protected and scene_root != object:
+					default_value = scene_value # Value is overwritten from inherited scenes
+				
+				# Convert node export to node path cuz that's how it is interally
 				if default_value is NodePath and not value is NodePath:
 					value = object.get_path_to(value)
 				

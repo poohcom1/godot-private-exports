@@ -65,6 +65,14 @@ func test_external_properties():
 	assert(plugin.is_property_visible(root, base, "protected_export") == false, "Protected export should not be visible")
 	assert(plugin.is_property_visible(root, base, "private_export") == false, "Protected export should not be visible")
 
+	var inherited = root.get_node("Inherited")
+	assert(plugin.is_property_visible(root, inherited, "public_export") == true, "Public export should be visible")
+	assert(plugin.is_property_visible(root, inherited, "protected_export") == false, "Protected export should not be visible")
+	assert(plugin.is_property_visible(root, inherited, "private_export") == false, "Private export should not be visible")
+	assert(plugin.is_overwriting_default(root, inherited, "public_export") == false, "Public export should be overriding")
+	assert(plugin.is_overwriting_default(root, inherited, "protected_export") == false, "Protected export should not be overriding")
+	assert(plugin.is_overwriting_default(root, inherited, "private_export") == false, "Private export should not be overriding")
+
 func test_external_broken_properties():
 	var root := ExternalBrokenScene.instantiate()
 	var base = root.get_node("Base")
