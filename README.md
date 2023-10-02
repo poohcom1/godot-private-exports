@@ -49,3 +49,9 @@ A: The addon is designed around scenes, not scripts. Scenes can be treated as "c
 | Setting      | Description                                                                                                                                            | Default  |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
 | Display Mode | `Always`: modifier always shown <br /> `Selected`: only shown on selected properties <br /> `Modified`: only shown on modified and selected properties | `Always` |
+
+## Development
+
+### Testing
+
+Testing is done manually in the `test/tests.gd`. It's an EditorScript, so we just run it and check that no asserts are failing.
