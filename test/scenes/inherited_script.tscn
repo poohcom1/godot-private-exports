@@ -5,4 +5,10 @@
 
 [node name="InheritedScript" instance=ExtResource("1_an25k")]
 script = ExtResource("2_54fui")
-inherted_export = 0
+inherited_public_export = 0
+inherited_protected_export = 0
+inherited_private_export = 0
+metadata/_access_modifiers = {
+"inherited_private_export": 2,
+"inherited_protected_export": 1
+}

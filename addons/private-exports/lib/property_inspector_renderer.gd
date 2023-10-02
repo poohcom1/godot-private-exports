@@ -62,7 +62,7 @@ func _draw_button(editor_property: EditorProperty):
 	if object != EditorInterface.get_edited_scene_root():
 		return
 	
-	var is_owner = _core.is_current_property_owner(property)
+	var is_owner = _core.is_current_property_owner(EditorInterface.get_edited_scene_root(), property)
 
 	var access_modifier = _core.get_access_modifier(object, property)
 

@@ -24,7 +24,11 @@ func _init() -> void:
 	add_child(_popup)
 	for i in Core.AccessModifier.values():
 		_popup.add_icon_item(IconMap[i], Core.AccessModifierNames[i], i)
-	_popup.id_pressed.connect(func(id: int): changed.emit(id))
+	_popup.id_pressed.connect(
+		func(id: int): 
+			changed.emit(id)
+			set_modifier(id)
+	)
 
 
 func _on_press():

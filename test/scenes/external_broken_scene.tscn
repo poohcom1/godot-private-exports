@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cfxdpc5pybn6d"]
+
+[ext_resource type="PackedScene" uid="uid://bx8gnmy8gtor5" path="res://test/scenes/base.tscn" id="1_0icey"]
+
+[node name="ExternalBrokenScene" type="Node2D"]
+
+[node name="Base" parent="." instance=ExtResource("1_0icey")]
+private_export = 5

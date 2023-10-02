@@ -22,4 +22,4 @@ func _parse_property(
 	usage_flags: int,
 	wide: bool
 ) -> bool:
-	return not _core.is_property_visible(object, name)
+	return not _core.is_property_visible(EditorInterface.get_edited_scene_root(), object, name)
