@@ -1,4 +1,4 @@
-## Core logic for creating
+## Core logic for creating and checking modifiers
 
 const _MetaKey = "_access_modifiers"
 
@@ -33,7 +33,10 @@ func set_access_modifier(
 func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
 	var scenes := _get_scene_data(object as Node)
 
-	for scene in scenes:
+	# Loop backward, in case some property is somehow set in a desecendant
+	for i in range(len(scenes) - 1, -1, -1):
+		var scene := scenes[i]
+		
 		if property in scene.metadata and scene.metadata[property]:
 			return scene.metadata[property]
 
@@ -183,7 +186,7 @@ func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneDa
 				scene_data.scene_script = val
 			else:
 				scene_data.scene_properties[prop] = val
-
+		
 		scene = scene_state.get_node_instance(0)
 		scene_data_arr.append(scene_data)
 	
@@ -201,6 +204,7 @@ func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneDa
 		if not current_script:
 			continue
 	
+		# Set default values
 		for prop in current_script.get_script_property_list():
 			if not prop.name in scene_data.scene_properties:
 				scene_data.scene_properties[prop.name] = scene_data.scene_script.get_property_default_value(prop.name)
@@ -210,5 +214,6 @@ func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneDa
 
 class CachedSceneData:
 	var scene_script: Script = null
+	# Modifiers
 	var metadata := {}
 	var scene_properties := {}
