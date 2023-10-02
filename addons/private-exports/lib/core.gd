@@ -75,10 +75,11 @@ func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
 
 	if is_inherited_scene:
 		var script = scenes[0].scene_script
-		for prop in script.get_script_property_list():
-			if prop[&"name"] == property:
-				found = true
-				break
+		if script:
+			for prop in script.get_script_property_list():
+				if prop[&"name"] == property:
+					found = true
+					break
 
 	if not found and is_inherited_scene:
 		return false  # Is a native property and the current script is inherited
@@ -113,8 +114,11 @@ func is_overwriting_default(scene_root: Node, object: Object, property: StringNa
 		if property in scene.metadata:
 			var modifier: AccessModifier = scene.metadata[property]
 			
-			if modifier != AccessModifier.Public and property in scene.scene_properties:
+			if (modifier == AccessModifier.Private or modifier == AccessModifier.Protected and scene_root != object) and property in scene.scene_properties:
 				var default_value = scene.scene_properties[property]
+				if default_value is NodePath and not value is NodePath:
+					value = object.get_path_to(value)
+				
 				if default_value != value:
 					return true
 			else:
@@ -182,6 +186,9 @@ func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneDa
 			current_script = script
 		else:
 			scene_data_arr[i].scene_script = current_script
+	
+		if not current_script:
+			continue
 	
 		for prop in current_script.get_script_property_list():
 			if not prop.name in scene_data.scene_properties:

@@ -8,6 +8,7 @@ const InheritedScene := preload("res://test/scenes/inherited_scene.tscn")
 const ExternalScene := preload("res://test/scenes/external_scene.tscn")
 
 const ExternalBrokenScene := preload("res://test/scenes/external_broken_scene.tscn")
+const InheritedBrokenScene := preload("res://test/scenes/inherited_broken_scene.tscn")
 
 var plugin := PluginCore.new()
 
@@ -17,6 +18,7 @@ func _run():
 	test_external_properties()
 	
 	test_external_broken_properties()
+	test_inherited_broken_properties()
 	
 	print("Tests finished!")
 	
@@ -59,5 +61,19 @@ func test_external_broken_properties():
 	var root := ExternalBrokenScene.instantiate()
 	var base = root.get_node("Base")
 	
-	assert(plugin.is_overwriting_default(root, base, "protected_export") == false, "Non-modified private value should not be detected")
-	assert(plugin.is_overwriting_default(root, base, "private_export") == true, "Modified private value should not be detected")
+	assert(plugin.is_overwriting_default(root, base, "public_export") == false, "Non-modified public value on external base should not be detected")
+	assert(plugin.is_overwriting_default(root, base, "protected_export") == true, "Non-modified protected on external base value should be detected")
+	assert(plugin.is_overwriting_default(root, base, "private_export") == true, "Modified private value on external base should be detected")
+
+	var inherited = root.get_node("Inherited")
+	assert(plugin.is_overwriting_default(root, inherited, "public_export") == false, "Modified public value on external inherited should not be detected")
+	assert(plugin.is_overwriting_default(root, inherited, "protected_export") == true, "Modified protected value on external inherited should be detected")
+	assert(plugin.is_overwriting_default(root, inherited, "private_export") == true, "Modified private value on external inherited should be detected")
+
+func test_inherited_broken_properties():
+	var root := InheritedBrokenScene.instantiate()
+	
+	assert(plugin.is_overwriting_default(root, root, "public_export") == false, "Non-modified public value on inheritedbase should not be detected")
+	assert(plugin.is_overwriting_default(root, root, "protected_export") == false, "Non-modified protected on inherited value should not be detected")
+	assert(plugin.is_overwriting_default(root, root, "private_export") == true, "Modified private value on inherited should be detected")
+

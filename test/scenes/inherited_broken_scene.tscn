@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://byr6i0aodk0x3"]
+
+[ext_resource type="PackedScene" uid="uid://bx8gnmy8gtor5" path="res://test/scenes/base.tscn" id="1_kjhp5"]
+
+[node name="Inherited" instance=ExtResource("1_kjhp5")]
+public_export = 5
+protected_export = 5
+private_export = 5
