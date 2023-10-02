@@ -7,6 +7,8 @@ const BaseScene := preload("res://test/scenes/base.tscn")
 const InheritedScene := preload("res://test/scenes/inherited_scene.tscn")
 const ExternalScene := preload("res://test/scenes/external_scene.tscn")
 
+const InheritedScript := preload("res://test/scenes/inherited_script.tscn")
+
 const ExternalBrokenScene := preload("res://test/scenes/external_broken_scene.tscn")
 const InheritedBrokenScene := preload("res://test/scenes/inherited_broken_scene.tscn")
 
@@ -16,6 +18,8 @@ func _run():
 	test_base_scene()
 	test_inherited_properties()
 	test_external_properties()
+	
+	test_inherited_script()
 	
 	test_external_broken_properties()
 	test_inherited_broken_properties()
@@ -44,11 +48,15 @@ func test_inherited_properties():
 	assert(plugin.is_current_property_owner(root, "public_export") == false, "Inherited should not own public_export")
 	assert(plugin.is_current_property_owner(root, "protected_export") == false, "Inherited should not own protected_export")
 	assert(plugin.is_current_property_owner(root, "private_export") == false, "Inherited should own not private_export")
+
+func test_inherited_script():
+	var root := InheritedScript.instantiate()
 	
 	assert(plugin.is_current_property_owner(root, "inherited_public_export") == true, "Inherited should own inherited_public_export")
 	assert(plugin.is_current_property_owner(root, "inherited_protected_export") == true, "Inherited should own inherited_protected_export")
 	assert(plugin.is_current_property_owner(root, "inherited_private_export") == true, "Inherited should own inherited_private_export")
-	
+
+
 func test_external_properties():
 	var root := ExternalScene.instantiate()
 	var base = root.get_node("Base")
