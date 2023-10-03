@@ -38,7 +38,7 @@ jobs:
 
           GODOT_PACKAGE=Godot_v4.2-dev5_linux.x86_64
           wget https://downloads.tuxfamily.org/godotengine/4.2/dev5/Godot_v4.2-dev5_linux.x86_64.zip -P ${{ runner.temp }}
-          unzip ${{ runner.temp }}/$Godot_v4.2-dev5_linux.x86_64.zip -d $GODOT_HOME
+          unzip ${{ runner.temp }}/Godot_v4.2-dev5_linux.x86_64.zip -d $GODOT_HOME
           mv $GODOT_HOME/$GODOT_PACKAGE $GODOT_BIN
           chmod u+x $GODOT_BIN
           echo "GODOT_HOME=$GODOT_HOME" >> "$GITHUB_ENV"
