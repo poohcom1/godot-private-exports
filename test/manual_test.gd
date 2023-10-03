@@ -1,3 +1,4 @@
+# Manual Test
 @tool
 extends EditorScript
 

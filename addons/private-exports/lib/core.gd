@@ -100,7 +100,7 @@ func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
 
 
 func is_overwriting_default(scene_root: Node, object: Object, property: StringName) -> bool:
-	var scenes := _get_scene_data(object) # Check memory because values are set from the scene
+	var scenes := _get_scene_data(object)
 	
 	if len(scenes) == 0:
 		return false
@@ -116,6 +116,7 @@ func is_overwriting_default(scene_root: Node, object: Object, property: StringNa
 			continue
 			
 		var default_value = null
+		
 		if property in scene.scene_properties:
 			default_value = scene.scene_properties[property]
 			

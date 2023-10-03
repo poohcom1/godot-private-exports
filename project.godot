@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Private Exports"
+config/tags=PackedStringArray("addon")
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.png"
 
@@ -20,7 +21,7 @@ project/assembly_name="Private Exports"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/private-exports/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/private-exports/plugin.cfg")
 
 [filesystem]
 
