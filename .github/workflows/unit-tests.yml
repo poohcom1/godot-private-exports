@@ -10,10 +10,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        godot-version: ['4.2dev5'] # Insert here the Godot version you want to run your tests with
+        godot-version: ["4.2dev5"] # Insert here the Godot version you want to run your tests with
 
     name: "CI Unit Test 🐧 v${{ matrix.godot-version }}"
-    runs-on: 'ubuntu-22.04'
+    runs-on: "ubuntu-22.04"
     timeout-minutes: 10 # The overall timeout
 
     steps:
@@ -62,6 +62,24 @@ jobs:
         run: |
           chmod +x ./addons/gdUnit4/runtest.sh
           xvfb-run --auto-servernum ./addons/gdUnit4/runtest.sh --add "res://test" --audio-driver Dummy --display-driver x11 --rendering-driver opengl3 --screen 0 --continue
+      - name: "Publish Test Report"
+        if: ${{ always() }}
+        uses: dorny/test-reporter@v1.6.0
+        with:
+          name: "test_report_${{ matrix.godot-version }}"
+          path: "reports/**/results.xml"
+          reporter: java-junit
+          fail-on-error: "false"
+
+      - name: "Upload Unit Test Reports"
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "test_report_${{ matrix.godot-version }}"
+          path: |
+            reports/**
+            /var/lib/systemd/coredump/**
+            /var/log/syslog
 
   finalize:
     if: ${{ !cancelled() }}

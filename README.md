@@ -54,4 +54,4 @@ A: The addon is designed around scenes, not scripts. Scenes can be treated as "c
 
 ### Testing
 
-Testing is done manually in the `test/tests.gd`. It's an EditorScript, so we just run it and check that no asserts are failing.
+Most testing is done by gdUnit4. However, testing `is_overwriting_default` is not possible with gdUnit because it uses `Script.get_property_default_value`, which only works in the editor. To cover this, extra tests has been writen as an EditorScript in `test/manual_test.gd`.
