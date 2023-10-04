@@ -18,7 +18,7 @@ const AccessModifierNames = [
 func set_access_modifier(
 	undoredo: EditorUndoRedoManager, object: Object, property: StringName, modifier: AccessModifier
 ) -> void:
-	var scenes := _get_scene_data(object as Node)
+	var scenes := _get_scene_data(object)
 	var access_modifiers: Dictionary = scenes[0].metadata if scenes.size() > 0 else {}
 
 	var old_access_modifiers: Dictionary = access_modifiers.duplicate()
@@ -31,7 +31,7 @@ func set_access_modifier(
 
 
 func get_access_modifier(object: Object, property: StringName) -> AccessModifier:
-	var scenes := _get_scene_data(object as Node)
+	var scenes := _get_scene_data(object)
 
 	# Loop backward, in case some property is somehow set in a desecendant
 	for i in range(len(scenes) - 1, -1, -1):
@@ -43,7 +43,7 @@ func get_access_modifier(object: Object, property: StringName) -> AccessModifier
 	return AccessModifier.Public
 
 
-func is_property_visible(scene_root: Node, object: Object, property: StringName) -> bool:
+func is_property_visible(scene_root: Object, object: Object, property: StringName) -> bool:
 	var scenes := _get_scene_data(object, scene_root == object)
 	if object == scene_root:
 		# Check scene parents
@@ -69,7 +69,7 @@ func invalidate_cache():
 	_cached_packed_scene = null
 
 
-func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
+func is_current_property_owner(scene_root: Object, property: StringName) -> bool:
 	var scenes := _get_scene_data(scene_root, true)
 
 	# Check current script
@@ -99,7 +99,7 @@ func is_current_property_owner(scene_root: Node, property: StringName) -> bool:
 	return true
 
 
-func is_overwriting_default(scene_root: Node, object: Object, property: StringName) -> bool:
+func is_overwriting_default(scene_root: Object, object: Object, property: StringName) -> bool:
 	var scenes := _get_scene_data(object)
 	
 	if len(scenes) == 0:
@@ -146,8 +146,10 @@ func is_overwriting_default(scene_root: Node, object: Object, property: StringNa
 var _cached_scene_path: String = ""
 var _cached_packed_scene: PackedScene = null
 
-func _get_scene_data(node: Node, in_memory: bool = false) -> Array[CachedSceneData]:
+func _get_scene_data(node: Object, in_memory: bool = false) -> Array[CachedSceneData]:
 	if node == null: return []
+	if not node is Node: return []
+	
 	var scene_path = node.scene_file_path
 	if scene_path.is_empty(): return []
 	if scene_path != _cached_scene_path:

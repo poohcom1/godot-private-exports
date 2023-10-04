@@ -57,6 +57,8 @@ func _find_editor_properties(node: Node, callback: Callable):
 ## Hacky solution to inject button in the EditorProperty Control
 func _draw_button(editor_property: EditorProperty):
 	var object: Object = editor_property.get_edited_object()
+	if not object is Node:
+		return # Ignore Resources
 	var property := editor_property.get_edited_property()
 	
 	if object != EditorInterface.get_edited_scene_root():
@@ -91,6 +93,9 @@ func _draw_button(editor_property: EditorProperty):
 
 	editor_property.add_child(container)
 	if has_bottom_editor:
+		if object.get(editor_property.get_edited_property()) is Resource:
+			editor_property.move_child(container, 0)
+		else:
 			editor_property.set_bottom_editor(container)
 			
 	property_control.reparent(container)
